@@ -34,6 +34,11 @@
                 {{-- <div class="d-flex justify-content-end mb-3">
                     <a href="{{ route('company.export.pdf', ['companyId' => $get_all_company->id]) }}" class="btn btn-success"><i class="fa fa-file-pdf"></i> Export PDF</a>
                 </div> --}}
+                <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="excel_file">
+                    <button type="submit">Import Excel</button>
+                </form>
 
                 <div class="table-body">
                     <div class="table-responsive">

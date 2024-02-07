@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCompanyRequest;
-use App\Mail\CompanyCreated;
+use Validator;
 use App\Models\Company;
+use App\Mail\CompanyCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use Validator;
+use App\Http\Requests\StoreCompanyRequest;
+use App\Models\ImportExcel;
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
 class CompanyController extends Controller
@@ -190,6 +192,33 @@ class CompanyController extends Controller
 
         $pdf = PDF::loadView('pdf', compact('company'));
         return $pdf->download('company_' . $company->id . '.pdf');
+    }
+
+    public function importExcel(Request $request)
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls|max:2048' // Maksimum 2MB
+        ]);
+
+        $file = $request->file('excel_file');
+
+        // Import the Excel data
+        $import = new ImportExcel();
+        Excel::import($import, $file);
+
+        // Process the imported data in chunks
+        $chunks = $import->toArray();
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $row) {
+                Company::create([
+                    'name' => $row[0],
+                    'email' => $row[1],
+                    'website' => $row[2]
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Excel imported successfully!');
     }
 
 }
