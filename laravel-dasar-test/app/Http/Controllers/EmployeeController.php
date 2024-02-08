@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreEmployeeRequest;
 use App\Models\Company;
 use App\Models\Employee;
+use App\Imports\ImportUser;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\StoreEmployeeRequest;
 use Barryvdh\Snappy\Facades\SnappyPdf as PDF;
 
 class EmployeeController extends Controller
@@ -146,5 +148,21 @@ class EmployeeController extends Controller
         $employees = Employee::where('company', $company)->get();
         $pdf = PDF::loadView('employee_pdf', compact('employees'));
         return $pdf->download('employees.pdf');
+    }
+
+    public function importUser(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+        // add condition to check if the file is not empty
+        if ($request->file('file') == null) {
+            return redirect()->back()->with('error', 'Please select a file to import.');
+        }
+
+        // Import the users from Excel file
+        Excel::import(new ImportUser(), $request->file('file'));
+
+        return redirect()->back()->with('success', 'Users imported successfully.');
     }
 }

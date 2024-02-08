@@ -31,6 +31,11 @@
         <!-- Main content -->
         <div class="card">
             <div class="card-body space-md">
+                <form action="{{ route('import.excel') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="file">
+                    <button type="submit">Import Excel</button>
+                </form>
                 <div class="table-body">
                     <div class="table-responsive">
                         <table id="companies" class="table table-bordered text-nowrap">

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +24,8 @@ Route::resource('employee', EmployeeController::class);
 Route::get('company/{companyId}/export/pdf', [CompanyController::class, 'exportPdf'])->name('company.export.pdf');
 Route::get('employee/{employeeId}/export/pdf', [EmployeeController::class, 'exportPdf'])->name('employee.export.pdf');
 
-Route::post('/import-excel', [CompanyController::class, 'importExcel'])->name('import.excel');
+// Route::post('/import-excel', [CompanyController::class, 'importExcel'])->name('import.excel');
+Route::post('/import-excel', [EmployeeController::class, 'importUser'])->name('import.excel');
 
 
 
